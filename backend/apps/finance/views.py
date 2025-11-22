@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from .models import Payment
 from .serializers import PaymentSerializer
 from .logic import calculate_expected_payment
@@ -11,6 +12,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
 
     def create(self, request, *args, **kwargs):
+        if request.user.role == 'EMPLOYEE':
+            raise PermissionDenied("No tiene permisos para registrar pagos financieros.")
+        
         """
         Sobreescribimos el método de crear pago para agregar la lógica automática.
         """
